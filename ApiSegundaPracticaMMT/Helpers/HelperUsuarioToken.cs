@@ -1,4 +1,5 @@
 ﻿using ApiSegundaPracticaMMT.Models;
+using Newtonsoft.Json;
 using System.Security.Claims;
 
 namespace ApiSegundaPracticaMMT.Helpers
@@ -7,21 +8,21 @@ namespace ApiSegundaPracticaMMT.Helpers
     {
         private IHttpContextAccessor context;
         private HelperCrytography helper;
-        private IConfiguration conf;
+        private ModelVault vault;
 
-        public HelperUsuarioToken(IHttpContextAccessor context, HelperCrytography helper, IConfiguration conf)
+        public HelperUsuarioToken(IHttpContextAccessor context, HelperCrytography helper, ModelVault vault)
         {
             this.context = context;
             this.helper = helper;
-            this.conf = conf;
+            this.vault = vault;
         }
 
         public UsuariosCubo GetUsuario()
         {
             Claim claim = context.HttpContext.User.FindFirst(z => z.Type == "UserData");
             string json = claim.Value;
-            string jsonEmpleado = helper.Decrypt(json, conf.GetValue<string>("KeyCryt"));
-            UsuariosCubo model = JsonConvert.DeserializeObject<EmpleadoModel>(jsonEmpleado);
+            string jsonUsuario = helper.Decrypt(json, vault.CryptExamen);
+            UsuariosCubo model = JsonConvert.DeserializeObject<UsuariosCubo>(jsonUsuario);
             return model;
         }
     }

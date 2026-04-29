@@ -50,9 +50,9 @@ namespace ApiSegundaPracticaMMT.Repositories
             return await context.Cubos.ToListAsync();
         }
 
-        public async Task<Cubo> GetCubosMarcaAsync(string marca)
+        public async Task<List<Cubo>> GetCubosMarcaAsync(string marca)
         {
-            return await context.Cubos.Where(x => x.Marca == marca).FirstOrDefaultAsync();
+            return await context.Cubos.Where(x => x.Marca == marca).ToListAsync();
         }
 
         public async Task<UsuariosCubo> LogInUsuarioAsync(string email, string pass)
@@ -60,13 +60,14 @@ namespace ApiSegundaPracticaMMT.Repositories
             return await context.Usuarios.Where(x => x.Email == email && x.Pass == pass).FirstOrDefaultAsync();
         }
 
-        public async Task PostUsuarioAsync(string email, string pass, string imagen)
+        public async Task PostUsuarioAsync(string nombre, string email, string pass, string imagen)
         {
             int id = await GetMaxIdUsuariosAsync();
 
             UsuariosCubo user = new UsuariosCubo
             {
                 IdUsuario = id,
+                Nombre = nombre,
                 Email = email,
                 Pass = pass,
                 Imagen = imagen
