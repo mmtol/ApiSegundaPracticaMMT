@@ -1,5 +1,6 @@
 ﻿using ApiSegundaPracticaMMT.Data;
 using ApiSegundaPracticaMMT.Models;
+using ApiSegundaPracticaMMT.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiSegundaPracticaMMT.Repositories
@@ -7,10 +8,12 @@ namespace ApiSegundaPracticaMMT.Repositories
     public class RepositoryCubos
     {
         private CubosContext context;
+        private ServiceStorageBlobs service;
 
-        public RepositoryCubos(CubosContext context)
+        public RepositoryCubos(CubosContext context, ServiceStorageBlobs service)
         {
             this.context = context;
+            this.service = service;
         }
 
         //getCubos
@@ -47,12 +50,24 @@ namespace ApiSegundaPracticaMMT.Repositories
 
         public async Task<List<Cubo>> GetCubosAsync()
         {
-            return await context.Cubos.ToListAsync();
+            List<Cubo> cubos = await context.Cubos.ToListAsync();
+            foreach (Cubo cubo in cubos)
+            {
+                ModelStorage model = await service.FindBlobAsync("segundapracticacubos", cubo.Imagen);
+                cubo.Imagen = model.Uri;
+            }
+            return cubos;
         }
 
         public async Task<List<Cubo>> GetCubosMarcaAsync(string marca)
         {
-            return await context.Cubos.Where(x => x.Marca == marca).ToListAsync();
+            List<Cubo> cubos = await context.Cubos.Where(x => x.Marca == marca).ToListAsync();
+            foreach (Cubo cubo in cubos)
+            {
+                ModelStorage model = await service.FindBlobAsync("segundapracticacubos", cubo.Imagen);
+                cubo.Imagen = model.Uri;
+            }
+            return cubos;
         }
 
         public async Task<UsuariosCubo> LogInUsuarioAsync(string email, string pass)
