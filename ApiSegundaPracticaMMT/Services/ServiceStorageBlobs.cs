@@ -1,5 +1,6 @@
 ﻿using ApiSegundaPracticaMMT.Models;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 
 namespace ApiSegundaPracticaMMT.Services
 {
@@ -27,10 +28,20 @@ namespace ApiSegundaPracticaMMT.Services
             return model;
         }
 
-        public async Task PostBlobAsync(string container, string blob, Stream stream)
+        public async Task PostBlobAsync(string container, string blob, Stream stream, string contentType)
         {
             BlobContainerClient containerClient = client.GetBlobContainerClient(container);
-            await containerClient.UploadBlobAsync(blob, stream);
+            BlobClient blobClient = containerClient.GetBlobClient(blob);
+
+            var options = new BlobUploadOptions
+            {
+                HttpHeaders = new BlobHttpHeaders
+                {
+                    ContentType = contentType
+                }
+            };
+
+            await blobClient.UploadAsync(stream, options);
         }
     }
 }
